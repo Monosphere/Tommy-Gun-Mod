@@ -41,6 +41,7 @@ namespace TommyGunMod
         private string WeaponParentPath = "Player_Audrey(Clone)/Content/CameraPivot/HeadContainer/CameraContainer/GameCamera/ArmsContainer/";
         Player player = null;
         GameObject tommyGun;
+        AssetBundle gunAsset = null;
         bool hasGunEquipped = false;
         float timeSinceLastShot;
         RaycastHit[] hits;
@@ -56,9 +57,11 @@ namespace TommyGunMod
                 {
                     player = FindObjectOfType<Player>();
                     Debug.Log("FOUND PLAYER");
-                    Stream str = Assembly.GetExecutingAssembly().GetManifestResourceStream("TommyGunMod.Assets.tommygun");
-                    AssetBundle gunAsset = AssetBundle.LoadFromStream(str);
-
+                    if (gunAsset == null)
+                    {
+                        Stream str = Assembly.GetExecutingAssembly().GetManifestResourceStream("TommyGunMod.Assets.tommygun");
+                        gunAsset = AssetBundle.LoadFromStream(str);
+                    }
                     tommyGun = Instantiate(gunAsset.LoadAsset<GameObject>("Tommy_Gun"));
                     tommyGun.transform.SetParent(GameObject.Find(WeaponParentPath).transform);
                     tommyGun.transform.localScale = new Vector3(100f, 100f, 100f);
@@ -90,7 +93,7 @@ namespace TommyGunMod
                             {
                                 tommyGun.GetComponent<AudioSource>().Stop();
                                 tommyGun.GetComponent<AudioSource>().Play();
-                                hits = Physics.RaycastAll(player.GameCamera.transform.position, player.GameCamera.transform.forward);
+                                hits = Physics.RaycastAll(player.GameCamera.transform.position, player.GameCamera.transform.forward,5f);
                                 foreach (RaycastHit hit in hits)
                                 {
                                     Transform objectHit = hit.transform;
